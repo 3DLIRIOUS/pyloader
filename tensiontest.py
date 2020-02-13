@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
 """
 tensiontest.py
 
@@ -17,8 +19,11 @@ You need FreeloaderError to catch any errors while connecting.
 And you need BasicTest, which is the class you are extending.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 from basictest import BasicTest, Freeloader, FreeloaderError
 import traceback
+from six.moves import input
 
 class TensionTest(BasicTest):
     """
@@ -50,11 +55,11 @@ class TensionTest(BasicTest):
         """
 
         # PRE-TEST: USER INTERACTION, IF ANY
-        linspd = int(raw_input("Enter linear speed in mm/min from 0 to 70: "))
-        broken = float(raw_input("Enter break detect load: "))
+        linspd = int(input("Enter linear speed in mm/min from 0 to 70: "))
+        broken = float(input("Enter break detect load: "))
 
         # TEST PROCESS - MOTOR MOVING, DATA COLLECTED
-        print "Beginning test."
+        print("Beginning test.")
         self.initialize_data()
         self.fl.start_motor(linspd, down = False)
         self.collect_until("load", "greaterthan", broken)
@@ -62,9 +67,9 @@ class TensionTest(BasicTest):
         self.fl.stop_motor()
 
         # POST-TEST: USER INTERACTION, IF ANY, AND CLEANUP
-        print "Please remove the test piece. Hit any key when ready."
+        print("Please remove the test piece. Hit any key when ready.")
         self.wait_for_keyboard()
-        print "Returning to original position."
+        print("Returning to original position.")
         self.fl.start_motor(linspd, down = True)
         self.wait_until("position", "lessthan", self.get_first_value("position"))
         self.fl.stop_motor()
@@ -94,11 +99,11 @@ if __name__ == '__main__':
         test.run_test()
         test.fl.disconnect()
     except FreeloaderError as fe:
-        print "Something went wrong during the test:"
-        print fe.msg
-        out = raw_input("Hit enter to exit program.")
+        print("Something went wrong during the test:")
+        print(fe.msg)
+        out = input("Hit enter to exit program.")
     except:
-        print "Unexpected code error!"
-        out = raw_input("Hit enter to show exception.")
+        print("Unexpected code error!")
+        out = input("Hit enter to show exception.")
         traceback.print_exc()
-        out = raw_input("Hit enter to exit program.")
+        out = input("Hit enter to exit program.")

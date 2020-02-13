@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
 """
 basictest.py
 
@@ -21,8 +23,12 @@ and call set_columns() before running the test.
 For an example test class which uses this, see tensiontest.py.
 """
 
-import sys, msvcrt, time, Tkinter, tkFileDialog
+from __future__ import absolute_import
+from __future__ import print_function
+import sys, msvcrt, time, six.moves.tkinter, six.moves.tkinter_filedialog
 from freeloader import Freeloader, FreeloaderError
+from six.moves import range
+from six.moves import input
 
 class BasicTest():
     """Represents a basic test and provides useful methods. Meant to be extended."""
@@ -57,9 +63,9 @@ class BasicTest():
 
     def exit_error(self, error):
         """Prompts before exiting, so user has time to read error."""
-        print error
+        print(error)
         self.fl.disconnect()
-        out = raw_input("Hit enter to exit program.")
+        out = input("Hit enter to exit program.")
         sys.exit(0)
 
     def collect_data(self):
@@ -117,8 +123,8 @@ class BasicTest():
 
     def run_test(self):
         """Main test routine. Must be overriden by user."""
-        print "This is the basic template test. It does nothing. You must write a test class"
-        print "which inherits from BasicTest in order to define an actual test."
+        print("This is the basic template test. It does nothing. You must write a test class")
+        print("which inherits from BasicTest in order to define an actual test.")
 
     def collect_until(self, value, fun, threshold, rate = 1000000, verbose = True):
         """
@@ -141,8 +147,8 @@ class BasicTest():
                 loop_start = time.time()
                 self.data.append(self.collect_data())
                 if verbose:
-                    print value + ": " + str(round(self.get_last_value(value),2)) + \
-                        "\ttarget: " + fun + " " + str(threshold)
+                    print(value + ": " + str(round(self.get_last_value(value),2)) + \
+                        "\ttarget: " + fun + " " + str(threshold))
                 while (time.time()-loop_start) < loop_time:
                     pass
                 if msvcrt.kbhit():
@@ -173,8 +179,8 @@ class BasicTest():
         while not self.funs[fun](localdat[self.col[value]], threshold):
             localdat = self.collect_data()
             if verbose:
-                print value + ": " + str(round(localdat[self.col[value]],2)) + \
-                    "\ttarget: " + fun + " " + str(threshold)
+                print(value + ": " + str(round(localdat[self.col[value]],2)) + \
+                    "\ttarget: " + fun + " " + str(threshold))
             time.sleep(.01)
             if msvcrt.kbhit():
                 msvcrt.getch()
@@ -226,7 +232,7 @@ class BasicTest():
         """
         if not len(self.data):
             self.exit_error("Can't write file - no data available.")
-        root = Tkinter.Tk()         # These "root" calls are annoying Tk hacks to make
+        root = six.moves.tkinter.Tk()         # These "root" calls are annoying Tk hacks to make
         root.withdraw()             # the file dialogue appear by itself with focus.
         root.overrideredirect(True)
         root.geometry('0x0+0+0')
@@ -235,9 +241,9 @@ class BasicTest():
         root.focus_force()
         options = {'defaultextension': '.csv', \
             'filetypes':[('CSV','.csv')], 'title': "Save Data As"}
-        fname = tkFileDialog.asksaveasfilename(**options)
+        fname = six.moves.tkinter_filedialog.asksaveasfilename(**options)
         if fname == '':
-            print "Save aborted."
+            print("Save aborted.")
             return
         f = open(fname,'w')
         f.write(h)

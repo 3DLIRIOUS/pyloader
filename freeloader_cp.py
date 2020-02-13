@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
 """
 Simple GUI for controlling a Freeloader.
 Buttons and controls generally change state variables stored in the handles
@@ -8,16 +10,19 @@ This is a Tkinter GUI. Fully documenting it here would be a little cumbersome,
 but the below should be self-explanatory enough.
 """
 
-from Tkinter import *
+from __future__ import absolute_import
+from __future__ import print_function
+from six.moves.tkinter import *
 from freeloader import Freeloader, FreeloaderError
-import ttk, sys
+import six.moves.tkinter_ttk, sys
+from six.moves import input
 
 def update_GUI(gui, h, fl):
     if (not h.stopped) and (not h.override):
         try:
             fl.start_motor(h.SliderSpeed.get(), down = h.down)
         except:
-            print "There was an error setting speed!"
+            print("There was an error setting speed!")
     h.position = fl.get_linear_position()
     h.load = fl.read_cell()
     h.PositionOut.configure(text=str(round(h.position,2))+" mm")
@@ -50,7 +55,7 @@ def go_down(h, fl):
 
 def move(h, fl):
     h.target = h.position + float(h.TextMove.get(1.0,END))
-    print "Moving to position " + str(round(h.target,2))
+    print("Moving to position " + str(round(h.target,2)))
 
 def stop(h, fl):
     h.target = None
@@ -58,7 +63,7 @@ def stop(h, fl):
     try:
         fl.stop_motor()
     except:
-        print "There was an error sending the stop command!"
+        print("There was an error sending the stop command!")
 
 def init_GUI(gui, h, fl):
     """This initializes callbacks and bindings (functions that get called when
@@ -317,9 +322,9 @@ fl = Freeloader()
 try:
     fl.autoconnect()
 except FreeloaderError as fe:
-    print "Autoconnect failed"
-    print fe.msg
-    out = raw_input("Hit enter to exit program.")
+    print("Autoconnect failed")
+    print(fe.msg)
+    out = input("Hit enter to exit program.")
     sys.exit(0)
 gui = Tk()
 h = populate_gui(gui)

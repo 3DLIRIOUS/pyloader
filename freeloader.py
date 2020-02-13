@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
 """
 freeloader.py
 
@@ -11,11 +13,11 @@ It assumes you have a simple Freeloader consisting of the following:
 
 The rest can be specified by the user. Usage is described below.
 
-This code is made available under a Creative Commons
-Attribution-Noncommercial-Share-Alike 3.0 license. See
-<http://creativecommons.org/licenses/by-nc-sa/3.0> for details.
+This code is made available under the BSD license. See license.txt for details.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import time
 import serial
 import dynamixel
@@ -93,7 +95,7 @@ class Freeloader():
             self.cell = serial.Serial(port, baudr, timeout = .5)
         except:
             raise FreeloaderError("Error opening load cell port.")
-        out = self.cell.write("SPS " + str(sps) + "\r")
+        out = self.cell.write(("SPS " + str(sps) + "\r").encode())
         self.cell_online = 1
         # Lastly, make sure we received an appropriate response to SPS setting.
         try:
@@ -115,34 +117,34 @@ class Freeloader():
         Failure to connect in any case will raise a descriptive FreeloaderError.
         """
         if verbose:
-            print "Scanning for load cell..."
+            print("Scanning for load cell...")
         for port in list_ports.comports():
             try:
                 self.connect_load(port[0], loadbaud, loadsps)
                 if verbose:
-                    print "Connected to load cell on " + port[0]
+                    print("Connected to load cell on " + port[0])
                 break
             except FreeloaderError as fe:
                 if verbose:
-                    print "No load cell found on " + port[0] # + " (" + fe.msg + ")"
+                    print("No load cell found on " + port[0]) # + " (" + fe.msg + ")"
         if not self.cell_online:
             if verbose:
-                print "Autoconnect failed to find a load cell."
+                print("Autoconnect failed to find a load cell.")
             raise FreeloaderError("Could not find a load cell.")
         if verbose:
-            print "Scanning for Dynamixel..."
+            print("Scanning for Dynamixel...")
         for port in list_ports.comports():
             try:
                 self.connect_dynamixel(port[0], dynabaud)
                 if verbose:
-                    print"Connected to Dynamixel on " + port[0]
+                    print("Connected to Dynamixel on " + port[0])
                 break
             except FreeloaderError:
                 if verbose:
-                    print "No Dynamixel found on " + port[0]
+                    print("No Dynamixel found on " + port[0])
         if not self.dyna_online:
             if verbose:
-                print "Autoconnect failed to find a Dynamixel."
+                print("Autoconnect failed to find a Dynamixel.")
             self.disconnect()
             raise FreeloaderError("Could not find a Dynamixel.")
         
@@ -261,15 +263,15 @@ class Freeloader():
 
 
 if __name__ == '__main__':
-    print "This is a module to be imported into a program."
-    print "Since you tried to run it directly, it will try to find a machine."
+    print("This is a module to be imported into a program.")
+    print("Since you tried to run it directly, it will try to find a machine.")
 
     try:
         fl = Freeloader()
-        print "Connecting..."
+        print("Connecting...")
         fl.autoconnect(verbose = True)
-        print "Connected to machine successfully."
-        print "Disconnecting..."
+        print("Connected to machine successfully.")
+        print("Disconnecting...")
         fl.disconnect()
     except FreeloaderError as fe:
         pass # Because verbose is on, we already have info.

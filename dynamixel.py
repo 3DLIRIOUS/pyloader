@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
 """
 dynamixel.py
 
@@ -30,7 +32,11 @@ Several range checks were changed throught to accomodate MX-64 values.
 Servo-mode commands for AX-12 (set degrees, etc) were removed.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import serial, time
+from six.moves import map
+from six.moves import range
 
 # The types of packets.
 PING       = [0x01]
@@ -57,7 +63,7 @@ def _Checksum(s):
 def _VerifyID(id):
   """Raises a ValueError if the id is not in valid range."""
   if not (0 <= id <= 0xFD):
-    raise ValueError, "ID %d isn't legal!" % id
+    raise ValueError("ID %d isn't legal!" % id)
 
 def _EnWire(v):
   """
@@ -65,7 +71,7 @@ def _EnWire(v):
   list [lsbyte, msbyte]. Used to transmit 16-bit values.
   """
   if not 0 <= v <= 65535:
-    raise ValueError, "EnWiring illegal value: %d" % v
+    raise ValueError("EnWiring illegal value: %d" % v)
   return [v & 255, v >> 8]
 
 def _DeWire(v):
@@ -104,7 +110,7 @@ class Response:
   def Verify(self):
     """Raises a ValueError if any errors occurred on motor or in packet."""
     if len(self.errors) != 0:
-      raise ValueError, "ERRORS: %s" % " ".join(self.errors)
+      raise ValueError("ERRORS: %s" % " ".join(self.errors))
     return self  # Syntactic sugar; lets us do return foo.Verify().
 
 class ServoController:
@@ -233,7 +239,7 @@ class ServoController:
     packet = READ_DATA + [0x24] + [2]
     res = self.Interact(id, packet).Verify()
     if len(res.parameters) != 2:
-      raise ValueError, "GetPosition didn't get two parameters!"
+      raise ValueError("GetPosition didn't get two parameters!")
     return _DeWire(res.parameters)
 
   def GetPositionDegrees(self, id):
@@ -244,14 +250,14 @@ class ServoController:
     """Set servo id to be at a position from 0-4096 for MX-64."""
     _VerifyID(id)
     if not (0 <= position <= 4096):
-      raise ValueError, "Invalid position!"
+      raise ValueError("Invalid position!")
     packet = WRITE_DATA + [0x1e] + _EnWire(position)
     self.Interact(id, packet).Verify()
 
   def SetPositionDegrees(self, id, deg):
     """Set the position in degrees for a servo-mode MX-64."""
     if not 0 <= deg <= 360:
-      raise ValueError, "%d is not a valid angle!" % deg
+      raise ValueError("%d is not a valid angle!" % deg)
     self.SetPosition(id, int(4096.0/360 * deg))
 
   def SetID(self, id, nid):
@@ -261,7 +267,7 @@ class ServoController:
     """
     _VerifyID(id)
     if not 0 <= nid <= 253:
-      raise ValueError, "%id is not a valid servo ID!" % nid
+      raise ValueError("%id is not a valid servo ID!" % nid)
     packet = WRITE_DATA + [0x03] + [nid]
     self.Interact(id, packet).Verify()
   
@@ -271,14 +277,14 @@ class ServoController:
     packet = READ_DATA + [0x20] + [2]
     Q = self.Interact(id, packet).Verify()
     if len(Q.parameters) != 2:
-      raise ValueError, "GetMovingSpeed has the wrong return shape!"
+      raise ValueError("GetMovingSpeed has the wrong return shape!")
     return _DeWire(Q.parameters)
 
   def SetMovingSpeed(self, id, speed):
     """Set the moving speed. 0 means stopped for MX-64 in wheel mode."""
     _VerifyID(id)
     if not 0 <= speed <= 2048:
-      raise ValueError, "%d is not a valid moving speed!" % speed
+      raise ValueError("%d is not a valid moving speed!" % speed)
     packet = WRITE_DATA + [0x20] + _EnWire(speed)
     self.Interact(id, packet).Verify()
 
@@ -290,5 +296,5 @@ class ServoController:
     return Q.parameters[0] == 1
 
 if __name__ == "__main__":
-  print "Can't run this directly."
-  print "Use 'from dynamixel import ServoController'"
+  print("Can't run this directly.")
+  print("Use 'from dynamixel import ServoController'")
